@@ -1,82 +1,72 @@
 import Holding from "./model/Holding.js";
-import getPrice from "./controller/coingecko.js";
+import getPrice from "./Controller/coingecko.js";
+import { buildUserPortfolios } from "./service/portfolioService.js";
 
-const calculatePrices = async () => {
-    const holdings = await Holding.find();
-    const coinIds = [...new Set(holdings.map(h => h.coinId))];
-    if (!coinIds.length) return;
+const calculatePrices = async (io) => {
+    try {
+        const holdings = await Holding.find();
+        const coinIds = [...new Set(holdings.map(h => h.coinId))];
+        if (!coinIds.length) return;
 
-    const prices = await getPrice(coinIds);
-    const users = {};
+        const prices = await getPrice(coinIds);
 
-    holdings.forEach(h => {
-        const currentPrice = prices[h.coinId]?.usd || 0;
-
-        const cost = h.amount * h.buyPrice;
-        const currentValue = h.amount * currentPrice;
-        const profit = currentValue - cost;
-        const profitStatus = profit >= 0 ? "profit" : "loss";
-
-        if (!users[h.userId]) {
-            users[h.userId] = {
-                totalCost: 0,
-                currentValue: 0,
-                totalProfit: 0,
-                profitStatus: "profit",
-                holdings: []
-            };
+        if (!prices) {
+            console.warn("Price fetch failed or rate limited — skipping this cycle.");
+            return;
         }
 
-        users[h.userId].totalCost += cost;
-        users[h.userId].currentValue += currentValue;
-        users[h.userId].totalProfit += profit;
+        const users = buildUserPortfolios(holdings, prices);
 
-        users[h.userId].holdings.push({
-            symbol: h.symbol,
-            amount: h.amount,
-            buyPrice: h.buyPrice,
-            currentPrice,
-            totalValue: currentValue,
-            profit,
-            profitStatus
-        });
-    });
+        Object.entries(users).forEach(([userId, data]) => {
+            data.profitStatus = data.totalProfit >= 0 ? "profit" : "loss";
 
-    Object.entries(users).forEach(([userId, data]) => {
-        data.profitStatus = data.totalProfit >= 0 ? "profit" : "loss";
+            const roi = data.totalCost
+                ? (data.totalProfit / data.totalCost) * 100
+                : 0;
 
-        const roi = data.totalCost
-            ? (data.totalProfit / data.totalCost) * 100
-            : 0;
-
-        console.log("=================================");
-        console.log(`User: ${userId}`);
-        console.log(`Total Cost: $${data.totalCost.toFixed(2)}`);
-        console.log(`Current Value: $${data.currentValue.toFixed(2)}`);
-        console.log(
-            `Total ${data.profitStatus.toUpperCase()}: $${data.totalProfit.toFixed(2)}`
-        );
-        console.log(`ROI: ${roi.toFixed(2)}%`);
-        console.log("Holdings:");
-
-        data.holdings.forEach(h => {
+            console.log("=================================");
+            console.log(`User: ${userId}`);
+            console.log(`Total Cost: $${data.totalCost.toFixed(2)}`);
+            console.log(`Current Value: $${data.currentValue.toFixed(2)}`);
             console.log(
-                `  ${h.symbol} | Amount: ${h.amount} | Buy: $${h.buyPrice} | ` +
-                `Current: $${h.currentPrice} | Value: $${h.totalValue.toFixed(2)} | ` +
-                `${h.profitStatus.toUpperCase()}: $${h.profit.toFixed(2)}`
+                `Total ${data.profitStatus.toUpperCase()}: $${data.totalProfit.toFixed(2)}`
             );
-        });
+            console.log(`ROI: ${roi.toFixed(2)}%`);
+            console.log("Holdings:");
 
-        console.log("=================================");
-    });
+            data.holdings.forEach(h => {
+                console.log(
+                    `  ${h.symbol} | Amount: ${h.amount} | Buy: $${h.buyPrice} | ` +
+                    `Current: $${h.currentPrice} | Value: $${h.totalValue.toFixed(2)} | ` +
+                    `${h.profitStatus.toUpperCase()}: $${h.profit.toFixed(2)}`
+                );
+            });
+
+            console.log("=================================");
+
+            // emit to user's room if io provided
+            if (io && typeof io.to === 'function') {
+                io.to(userId).emit('portfolioUpdate', {
+                    totalCost: data.totalCost,
+                    currentValue: data.currentValue,
+                    totalProfit: data.totalProfit,
+                    profitStatus: data.profitStatus,
+                    roi,
+                    holdings: data.holdings
+                });
+            }
+        });
+    } catch (err) {
+        console.error('Error in calculatePrices:', err.message || err);
+    }
 };
 
-const startPriceJob = () => {
+const startPriceJob = (io) => {
     // 🔥 run immediately
-    calculatePrices();
+    calculatePrices(io);
 
     // ⏱️ then every 30 seconds
-    setInterval(calculatePrices, 30000);
+    setInterval(() => calculatePrices(io), 30000);
 };
 
 export default startPriceJob;

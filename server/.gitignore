@@ -4,4 +4,23 @@ node_modules/
 dist/
 build/
 # environment files
-env/
+.env
+.env*
+!.env.example
+
+# logs
+logs/
+*.log
+
+# coverage
+coverage/
+.nyc_output/
+
+# caches
+.eslintcache
+.cache/
+
+# editor/OS
+.vscode/
+.idea/
+.DS_Store

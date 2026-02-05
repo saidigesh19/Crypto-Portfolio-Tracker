@@ -1,16 +1,16 @@
-import express from 'express';
-import  Holding  from "../model/Holding.js";
-const router = express.Router()
+import express from "express";
+import {
+  createHolding,
+  getHoldingsByUser,
+  updateHoldingById,
+  deleteHoldingById,
+} from "../Controller/holdingController.js";
 
-router.post("/", async (req, res) => {
-    const holding = await Holding.create(req.body);
-    res.json(holding);
-});
+const router = express.Router();
 
-
-router.get("/:userId", async (req, res)=>{
-    const holding = await Holding.find({ userId: req.params.userId } );
-    res.json(holding);
-});
+router.post("/", createHolding);
+router.get("/:userId", getHoldingsByUser);
+router.put("/:id", updateHoldingById);
+router.delete("/:id", deleteHoldingById);
 
 export default router;

@@ -1,0 +1,166 @@
+/* Dashboard Styling */
+
+.portfolio-card {
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(7,18,38,0.85), rgba(6,12,28,0.9));
+  transition: transform 220ms ease, box-shadow 220ms ease;
+  box-shadow: 0 12px 30px rgba(2,6,23,0.7);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.portfolio-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 70px rgba(2,6,23,0.85);
+}
+
+.portfolio-card-profit {
+  border-left: 6px solid #10b981;
+}
+
+.portfolio-card-loss {
+  border-left: 6px solid #ef4444;
+}
+
+.portfolio-card .MuiCardContent-root {
+  padding: 20px;
+}
+
+.portfolio-card .MuiTypography-h5 {
+  font-size: 1.15rem;
+  margin: 6px 0;
+  color: #e6eef8;
+}
+
+.portfolio-card .MuiTypography-caption {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+/* Table Styling */
+.MuiTableContainer-root {
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.04);
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(6,12,28,0.7), rgba(4,8,20,0.6));
+}
+
+.MuiTable-root {
+  min-width: 750px;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  background: linear-gradient(90deg, rgba(124,58,237,0.12), rgba(30,58,138,0.06));
+  color: #e6eef8;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(255,255,255,0.06);
+}
+
+.MuiTableBody-root .MuiTableCell-root {
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  padding: 12px 14px;
+  color: #e6eef8;
+}
+
+.MuiTableBody-root .MuiTableRow-root:hover {
+  background-color: rgba(255,255,255,0.02);
+}
+
+/* Enhanced holdings table styles */
+.holdings-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+}
+
+.holdings-table .MuiTableHead-root {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.holdings-table .MuiTableHead-root .MuiTableCell-root {
+  background: linear-gradient(90deg, rgba(8,16,48,0.95), rgba(40,16,80,0.9));
+  color: #f8fafc;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.holdings-table .MuiTableBody-root .MuiTableRow-root {
+  transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.holdings-table .MuiTableBody-root .MuiTableRow-root:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(2,6,23,0.4);
+  background-color: rgba(255,255,255,0.02);
+}
+
+/* Zebra rows for readability */
+.holdings-table .MuiTableBody-root .MuiTableRow-root:nth-of-type(even) {
+  background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+}
+
+.holdings-table .MuiTableBody-root .MuiTableRow-root:nth-of-type(odd) {
+  background: linear-gradient(90deg, rgba(255,255,255,0.00), rgba(255,255,255,0.01));
+}
+
+/* Action column sizing */
+.holdings-table .action-cell {
+  width: 120px;
+  white-space: nowrap;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+}
+
+/* Slightly larger asset name for emphasis */
+.holdings-table .MuiTableBody-root .MuiTableCell-root:first-child {
+  font-weight: 600;
+  color: #eef2ff;
+}
+
+/* Profit / Loss cell backgrounds */
+.holdings-table .MuiTableBody-root .MuiTableCell-root .MuiChip-colorSuccess {
+  background: linear-gradient(90deg, rgba(16,185,129,0.12), rgba(16,185,129,0.06));
+  color: #a7f3d0;
+}
+
+.holdings-table .MuiTableBody-root .MuiTableCell-root .MuiChip-colorError {
+  background: linear-gradient(90deg, rgba(239,68,68,0.12), rgba(239,68,68,0.06));
+  color: #fecaca;
+}
+
+/* Current price and total value emphasis */
+.holdings-table .MuiTableBody-root .MuiTableCell-root:nth-child(2),
+.holdings-table .MuiTableBody-root .MuiTableCell-root:nth-child(4) {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.MuiChip-colorSuccess {
+  background-color: rgba(16,185,129,0.12);
+  color: #10b981;
+  font-weight: 600;
+}
+
+.MuiChip-colorError {
+  background-color: rgba(239,68,68,0.12);
+  color: #fb7185;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .MuiTable-root {
+    min-width: 100%;
+    font-size: 0.875rem;
+  }
+
+  .MuiTableCell-root {
+    padding: 12px 8px;
+  }
+
+  .portfolio-card .MuiTypography-h5 {
+    font-size: 1.25rem;
+  }
+}

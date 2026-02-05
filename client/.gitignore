@@ -11,6 +11,18 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env*
+!.env.example
+
+# coverage
+coverage/
+.nyc_output/
+
+# caches
+.eslintcache
+.cache/
+.env
 
 # Editor directories and files
 .vscode/*
