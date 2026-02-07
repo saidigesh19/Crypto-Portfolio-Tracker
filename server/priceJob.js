@@ -64,8 +64,7 @@ const calculatePrices = async (io) => {
 const startPriceJob = (io) => {
     // 🔥 run immediately
     calculatePrices(io);
-
-    // ⏱️ then every 30 seconds
+    // ⏱️ then every 30 seconds (tune as needed vs API limits)
     setInterval(() => calculatePrices(io), 30000);
 };
 

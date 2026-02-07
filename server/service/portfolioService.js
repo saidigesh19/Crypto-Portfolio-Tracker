@@ -22,7 +22,12 @@ export const buildUserPortfolios = (holdings, prices) => {
     users[h.userId].currentValue += currentValue;
     users[h.userId].totalProfit += profit;
 
+    // Calculate profitPercent for each holding
+    
+    const profitPercent = cost ? (profit / cost) * 100 : 0;
     users[h.userId].holdings.push({
+      _id: h._id,
+      coinId: h.coinId,
       symbol: h.symbol,
       amount: h.amount,
       buyPrice: h.buyPrice,
@@ -30,6 +35,7 @@ export const buildUserPortfolios = (holdings, prices) => {
       totalValue: currentValue,
       profit,
       profitStatus,
+      profitPercent,
     });
   });
 

@@ -1,44 +1,47 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Typography, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import Header from "./Header";
+import ConfirmDialog from "./dashboard/ConfirmDialog";
+import Header from "../Components/Header";
 import PortfolioSummaryCards from "./dashboard/PortfolioSummaryCards";
-import PortfolioCharts from "./dashboard/PortfolioCharts";
 import HoldingsTable from "./dashboard/HoldingsTable";
 import EditHoldingDialog from "./dashboard/EditHoldingDialog";
 import useHoldings from "../hooks/useHoldings";
 import useSocketPortfolio from "../hooks/useSocketPortfolio";
 import { updateHolding, deleteHolding } from "../api/holdings";
-import { fetchCoinPrices, fetchCoinList, buildPortfolio, buildPerCoinPnL } from "../utils/portfolio";
+import { getPortfolio } from "../api/portfolio";
 import "../styles/Dashboard.css";
+import PortfolioCharts from "./dashboard/PortfolioCharts";
+import { Skeleton } from "@mui/material";
+import { memo } from "react";
 
 const Dashboard = () => {
   const userId = localStorage.getItem("userId");
-  const navigate = useNavigate();
-  const { holdings: rawHoldings, setHoldings: setRawHoldings, loading, error } = useHoldings(userId);
-  const [displayHoldings, setDisplayHoldings] = useState([]);
+  const {
+    holdings,
+    setHoldings,
+    loading,
+    error,
+  } = useHoldings(userId);
+
   const [portfolioData, setPortfolioData] = useState(null);
-  const [chartPoints, setChartPoints] = useState([]);
-  const [coinSeries, setCoinSeries] = useState({});
-  const [chartWindow, setChartWindow] = useState("1d");
   const [editOpen, setEditOpen] = useState(false);
   const [editHolding, setEditHolding] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
+  // Edit dialog handlers
   const openEdit = (holding) => {
     setEditHolding(holding);
     setEditOpen(true);
   };
-
   const closeEdit = () => {
     setEditOpen(false);
     setEditHolding(null);
   };
-
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditHolding(prev => ({ ...prev, [name]: value }));
+    setEditHolding((prev) => ({ ...prev, [name]: value }));
   };
-
   const submitEdit = async () => {
     if (!editHolding || !editHolding._id) return;
     try {
@@ -47,97 +50,65 @@ const Dashboard = () => {
         coinId: editHolding.coinId,
         symbol: editHolding.symbol,
         amount: Number(editHolding.amount),
-        buyPrice: Number(editHolding.buyPrice)
+        buyPrice: Number(editHolding.buyPrice),
       };
       const updated = await updateHolding(id, payload);
-      setRawHoldings((prev) => prev.map((h) => (h._id === updated._id ? updated : h)));
+      setHoldings((prev) => prev.map((h) => (h._id === updated._id ? updated : h)));
       closeEdit();
     } catch (err) {
       console.error(err);
     }
   };
+  const handleDelete = async(holding) => {
+    if (!holding || !holding._id) {
+      alert("Invalid holding selected for deletion.");
+      return;
+    }
+    setDeleteTarget(holding);
+    setConfirmOpen(true);
+  };
 
-  const handleDelete = async (holding) => {
-    if (!holding || !holding._id) return;
-    if (!confirm('Delete this holding?')) return;
+  const confirmDelete = async () => {
+    if (!deleteTarget || !deleteTarget._id) {
+      setConfirmOpen(false);
+      return;
+    }
     try {
-      await deleteHolding(holding._id);
-      setRawHoldings((prev) => prev.filter((h) => h._id !== holding._id));
+      await deleteHolding(deleteTarget._id);
+      setHoldings((prev) => prev.filter((h) => h._id !== deleteTarget._id));
+      setConfirmOpen(false);
+      setDeleteTarget(null);
+      alert("Holding deleted successfully.");
     } catch (err) {
-      console.error(err);
+      setConfirmOpen(false);
+      setDeleteTarget(null);
+      alert("Failed to delete holding: " + (err.message || err));
     }
   };
-  const calculatePortfolioStats = useCallback(async () => {
-    if (!rawHoldings.length) return;
-
-    try {
-      const coinIds = [...new Set(rawHoldings.map((h) => h.coinId).filter(Boolean))];
-      if (coinIds.length === 0) return;
-
-      const prices = await fetchCoinPrices(coinIds);
-      let combinedPrices = { ...prices };
-
-      const missingIds = coinIds.filter((id) => !combinedPrices[id]);
-      if (missingIds.length > 0) {
-        try {
-          const coinList = await fetchCoinList();
-          const symbolToId = {};
-          coinList.forEach((c) => {
-            if (c?.symbol) symbolToId[c.symbol.toLowerCase()] = c.id;
-          });
-
-          const fallbackIds = [];
-          rawHoldings.forEach((h) => {
-            if (!combinedPrices[h.coinId] && h.symbol) {
-              const mapped = symbolToId[h.symbol.toLowerCase()];
-              if (mapped) fallbackIds.push(mapped);
-            }
-          });
-
-          if (fallbackIds.length > 0) {
-            const unique = [...new Set(fallbackIds)];
-            const fallbackPrices = await fetchCoinPrices(unique);
-            combinedPrices = { ...combinedPrices, ...fallbackPrices };
-          }
-        } catch (err) {
-          console.warn("CoinGecko fallback symbol->id mapping failed", err);
-        }
-      }
-
-      const { portfolioData: nextPortfolio, updatedHoldings } = buildPortfolio({
-        holdings: rawHoldings,
-        prices: combinedPrices,
-      });
-
-      setPortfolioData(nextPortfolio);
-      setDisplayHoldings(updatedHoldings);
-
-      const nowISO = new Date().toISOString();
-      setChartPoints((prev) => {
-        const next = [...prev, { time: nowISO, value: Number(nextPortfolio.totalValue) }];
-        return next.slice(-288);
-      });
-
-      const perCoin = buildPerCoinPnL(updatedHoldings);
-      setCoinSeries((prev) => {
-        const next = { ...prev };
-        Object.entries(perCoin).forEach(([sym, pnl]) => {
-          next[sym] = [...(next[sym] || []), { time: nowISO, value: pnl }].slice(-288);
-        });
-        return next;
-      });
-    } catch (err) {
-      console.error("Error calculating portfolio stats:", err);
-    }
-  }, [rawHoldings]);
 
   useEffect(() => {
-    calculatePortfolioStats();
-  }, [calculatePortfolioStats]);
+    const seed = async () => {
+      if (!userId) return;
+      try {
+        const data = await getPortfolio(userId);
+        setPortfolioData({
+          totalCost: Number(data.totalCost || 0).toFixed(2),
+          totalValue: Number(data.currentValue || 0).toFixed(2),
+          totalProfit: Number(data.totalProfit || 0).toFixed(2),
+          totalProfitPercent: Number(data.roi || 0).toFixed(2),
+          profitStatus: data.profitStatus || "profit",
+        });
+        setHoldings(Array.isArray(data.holdings) ? data.holdings : []);
+      } catch (err) {
+        console.warn("Initial portfolio fetch failed", err?.message || err);
+      }
+    };
+    seed();
+  }, [userId, setHoldings]);
 
   useSocketPortfolio({
     userId,
-    onUpdate: ({ payload, nowISO, perCoin }) => {
+    onUpdate: ({ payload }) => {
       if (!payload) return;
       setPortfolioData({
         totalCost: payload.totalCost.toFixed(2),
@@ -146,26 +117,18 @@ const Dashboard = () => {
         totalProfitPercent: payload.roi.toFixed(2),
         profitStatus: payload.profitStatus,
       });
-
-      setChartPoints((prev) => {
-        const next = [...prev, { time: nowISO, value: Number(payload.currentValue) }];
-        return next.slice(-288);
-      });
-
-      setCoinSeries((prev) => {
-        const next = { ...prev };
-        Object.entries(perCoin).forEach(([sym, pnl]) => {
-          next[sym] = [...(next[sym] || []), { time: nowISO, value: pnl }].slice(-288);
-        });
-        return next;
-      });
+      if (Array.isArray(payload.holdings)) {
+        setHoldings(payload.holdings);
+      }
     },
   });
 
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography>Loading portfolio...</Typography>
+        <Skeleton variant="rectangular" height={60} sx={{ mb: 2 }} />
+        <Skeleton variant="rectangular" height={220} sx={{ mb: 2 }} />
+        <Skeleton variant="rectangular" height={400} />
       </Container>
     );
   }
@@ -173,7 +136,7 @@ const Dashboard = () => {
   if (error) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography color="error">Error: {error}</Typography>
+        <Typography color="error" role="alert">Error: {error}</Typography>
       </Container>
     );
   }
@@ -182,31 +145,23 @@ const Dashboard = () => {
     <>
       <Header />
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <PortfolioSummaryCards portfolioData={portfolioData} />
-
-        <div style={{ marginBottom: 16 }}>
-          <Button variant="contained" color="primary" onClick={() => navigate("/add-holding")}>
-            Add Holding
-          </Button>
-        </div>
-
-        <PortfolioCharts
-          chartWindow={chartWindow}
-          setChartWindow={setChartWindow}
-          chartPoints={chartPoints}
-          coinSeries={coinSeries}
-          holdings={displayHoldings}
-        />
-
-        <HoldingsTable holdings={displayHoldings} onEdit={openEdit} onDelete={handleDelete} />
+        <PortfolioSummaryCards portfolioData={portfolioData} aria-label="Portfolio summary cards" />
+        <PortfolioCharts holdings={holdings} aria-label="Portfolio distribution chart" />
+        <HoldingsTable holdingsList={holdings} onEditHolding={openEdit} onDeleteHolding={handleDelete} aria-label="Holdings table" />
       </Container>
-
       <EditHoldingDialog
         open={editOpen}
         holding={editHolding}
         onChange={handleEditChange}
         onClose={closeEdit}
         onSave={submitEdit}
+      />
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete Holding"
+        content={deleteTarget ? `Are you sure you want to delete holding for ${deleteTarget.symbol}?` : "Are you sure you want to delete this holding?"}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={confirmDelete}
       />
     </>
   );
