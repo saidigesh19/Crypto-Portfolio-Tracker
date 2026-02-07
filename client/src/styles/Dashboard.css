@@ -9,8 +9,8 @@
 }
 
 .portfolio-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 28px 70px rgba(2,6,23,0.85);
+  box-shadow: 0 16px 40px rgba(2,6,23,0.7);
+  will-change: box-shadow;
 }
 
 .portfolio-card-profit {
@@ -92,9 +92,9 @@
 }
 
 .holdings-table .MuiTableBody-root .MuiTableRow-root:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(2,6,23,0.4);
+  box-shadow: 0 4px 12px rgba(2,6,23,0.25);
   background-color: rgba(255,255,255,0.02);
+  will-change: box-shadow;
 }
 
 /* Zebra rows for readability */
