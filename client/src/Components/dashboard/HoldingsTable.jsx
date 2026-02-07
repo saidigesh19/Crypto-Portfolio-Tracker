@@ -18,7 +18,8 @@ import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const HoldingsTable = ({ holdings, onEdit, onDelete }) => {
+
+function HoldingsTable({ holdingsList, onEditHolding, onDeleteHolding }) {
   return (
     <Card>
       <CardContent>
@@ -26,71 +27,48 @@ const HoldingsTable = ({ holdings, onEdit, onDelete }) => {
           Holdings Overview
         </Typography>
 
-        {holdings.length > 0 ? (
+        {holdingsList.length > 0 ? (
           <TableContainer component={Paper} className="holdings-table">
             <Table>
               <TableHead>
                 <TableRow sx={{ backgroundColor: "#f3f4f6" }}>
                   <TableCell sx={{ fontWeight: "bold" }}>Asset</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                    Current Price
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                    Amount
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                    Total Value
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                    Buy Price
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: "bold" }}>
-                    Profit/Loss
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                    Change %
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: "bold" }} className="action-cell">
-                    Action
-                  </TableCell>
+                  <TableCell align="right" sx={{ fontWeight: "bold" }}>Current Price</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: "bold" }}>Amount</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: "bold" }}>Total Value</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: "bold" }}>Buy Price</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: "bold" }}>Profit / Loss</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }}>Change (%)</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: "bold" }} className="action-cell">Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {holdings.map((holding) => (
+                {holdingsList.map((holdingItem) => (
                   <TableRow
-                    key={holding._id || holding.symbol}
+                    key={holdingItem._id || holdingItem.symbol}
                     sx={{ "&:hover": { backgroundColor: "#f9fafb" } }}
                   >
-                    <TableCell sx={{ fontWeight: "500" }}>
-                      {holding.symbol?.toUpperCase()}
-                    </TableCell>
-                    <TableCell align="right">
-                      {"$" + (holding.currentPrice?.toFixed(2) || "N/A")}
-                    </TableCell>
-                    <TableCell align="right">{holding.amount}</TableCell>
-                    <TableCell align="right">
-                      {"$" + (holding.totalValue?.toFixed(2) || "N/A")}
-                    </TableCell>
-                    <TableCell align="right">
-                      {"$" + (holding.buyPrice?.toFixed(2) || "N/A")}
-                    </TableCell>
+                    <TableCell sx={{ fontWeight: "500" }}>{holdingItem.symbol?.toUpperCase()}</TableCell>
+                    <TableCell align="right">{"$" + (holdingItem.currentPrice?.toFixed(2) || "N/A")}</TableCell>
+                    <TableCell align="right">{holdingItem.amount}</TableCell>
+                    <TableCell align="right">{"$" + (holdingItem.totalValue?.toFixed(2) || "N/A")}</TableCell>
+                    <TableCell align="right">{"$" + (holdingItem.buyPrice?.toFixed(2) || "N/A")}</TableCell>
                     <TableCell
                       align="right"
                       sx={{
-                        color: holding.profitStatus === "profit" ? "#10b981" : "#ef4444",
+                        color: holdingItem.profitStatus === "profit" ? "#10b981" : "#ef4444",
                         fontWeight: "bold",
                       }}
                     >
-                      {holding.profitStatus === "profit" ? "+" : ""}$
-                      {holding.profit?.toFixed(2) || "N/A"}
+                      {holdingItem.profitStatus === "profit" ? "+" : ""}${holdingItem.profit?.toFixed(2) || "N/A"}
                     </TableCell>
                     <TableCell align="center">
                       <Chip
-                        label={`${holding.profitStatus === "profit" ? "+" : ""}${holding.profitPercent}%`}
-                        color={holding.profitStatus === "profit" ? "success" : "error"}
+                        label={`${holdingItem.profitStatus === "profit" ? "+" : ""}${holdingItem.profitPercent}%`}
+                        color={holdingItem.profitStatus === "profit" ? "success" : "error"}
                         size="small"
                         icon={
-                          holding.profitStatus === "profit" ? (
+                          holdingItem.profitStatus === "profit" ? (
                             <TrendingUpIcon fontSize="small" />
                           ) : (
                             <TrendingDownIcon fontSize="small" />
@@ -99,10 +77,16 @@ const HoldingsTable = ({ holdings, onEdit, onDelete }) => {
                       />
                     </TableCell>
                     <TableCell align="center" className="action-cell">
-                      <IconButton size="small" onClick={() => onEdit(holding)}>
+                      <IconButton size="small" onClick={() => {
+                        console.log('Edit holding:', holdingItem);
+                        onEditHolding(holdingItem);
+                      }}>
                         <EditIcon fontSize="small" />
                       </IconButton>
-                      <IconButton size="small" color="error" onClick={() => onDelete(holding)}>
+                      <IconButton size="small" color="error" onClick={() => {
+                        console.log('Delete holding:', holdingItem);
+                        onDeleteHolding(holdingItem);
+                      }}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
@@ -119,6 +103,6 @@ const HoldingsTable = ({ holdings, onEdit, onDelete }) => {
       </CardContent>
     </Card>
   );
-};
+}
 
 export default HoldingsTable;

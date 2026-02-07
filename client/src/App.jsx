@@ -3,7 +3,7 @@ import React, { useState, useEffect, createContext } from 'react'
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Dashboard from "./Components/Dashboard";
+import Dashboard from "./Components/DashBoard";
 import Login from "./Components/Login";
 import Register from "./Components/Register";
 import AddHoldingPage from "./Components/AddHoldingPage";
