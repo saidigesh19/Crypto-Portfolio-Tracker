@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { login } from "../api/auth";
 import LockIcon from '@mui/icons-material/Lock';
+import { setCookie } from '../utils/cookies';
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -38,9 +39,8 @@ export default function Login() {
           user?.idStr ||
           user ||
           "demo-user";
-
-        localStorage.setItem("userId", userId);
         localStorage.setItem("user", JSON.stringify(user));
+        setCookie("userId", userId);
         navigate("/dashboard");
       }
     } catch (err) {
@@ -53,7 +53,7 @@ export default function Login() {
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
-      <Card>
+      <Card sx={{ background: 'linear-gradient(135deg, #181c2f 0%, #232946 80%, #6366f1 100%)', color: 'var(--text)', boxShadow: '0 8px 32px rgba(76,81,255,0.10)', border: 'none', borderRadius: '24px', backdropFilter: 'blur(8px)' }}>
         <CardContent>
           <Box
             sx={{
@@ -99,7 +99,7 @@ export default function Login() {
                 variant="contained"
                 fullWidth
                 disabled={loading}
-                sx={{ color: "#fff" }}
+                sx={{ background: 'linear-gradient(90deg, var(--accent-1), var(--accent-2))', color: '#e6eef8', fontWeight: 700 }}
               >
                 {loading ? "Logging in..." : "Log In"}
               </Button>

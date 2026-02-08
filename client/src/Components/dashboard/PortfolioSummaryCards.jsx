@@ -46,7 +46,7 @@ const PortfolioSummaryCards = ({ portfolioData }) => {
                 {card.label}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center', width: '100%' }}>
-                <Typography variant="h5" sx={{ fontWeight: 'bold', color: card.color || '#e6eef8' }}>
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: card.color || '#fafafa' }}>
                   {card.value}
                 </Typography>
                 {card.icon}

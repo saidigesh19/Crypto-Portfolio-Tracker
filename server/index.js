@@ -8,6 +8,7 @@ import holdingsRouter from "./router/holdingsRouter.js";
 import authRouter from "./router/auth.js";
 import setupSocket from "./socket.js";
 import startPriceJob from "./priceJob.js";
+import portfolio from "./router/portfolioRouter.js";
 dotenv.config()
 
 connectDB();
@@ -19,6 +20,7 @@ const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use("/api/holdings", holdingsRouter);
+app.use("/api/portfolio", portfolio);
 app.use("/api", authRouter);
 
 const server = http.createServer(app);;

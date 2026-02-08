@@ -10,6 +10,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { addHolding } from "../api/holdings";
+import { getCookie } from '../utils/cookies';
 
 const AddHolding = ({ onHoldingAdded }) => {
   const [formData, setFormData] = useState({
@@ -53,7 +54,10 @@ const AddHolding = ({ onHoldingAdded }) => {
 
     try {
       setLoading(true);
-      const userId = localStorage.getItem("userId");
+      let userId = localStorage.getItem("userId");
+      if (!userId) {
+        userId = getCookie("userId");
+      }
 
       const payload = {
         userId,

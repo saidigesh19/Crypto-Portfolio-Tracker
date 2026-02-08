@@ -13,6 +13,17 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import TimelineIcon from '@mui/icons-material/Timeline';
 
 const Header = ({ actionSlot }) => {
+  // Get user from localStorage
+  let userName = "";
+  try {
+    const user = JSON.parse(localStorage.getItem("user"));
+    userName = user?.name || "";
+    // Capitalize first letter of each word
+    userName = userName
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  } catch {}
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -98,6 +109,11 @@ const Header = ({ actionSlot }) => {
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
           >
+            {userName && (
+              <Box sx={{ px: 2, py: 1, fontWeight: 600, color: '#6366f1', textAlign: 'center' }}>
+                {userName}
+              </Box>
+            )}
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Box>

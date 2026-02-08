@@ -49,10 +49,10 @@ function HoldingsTable({ holdingsList, onEditHolding, onDeleteHolding }) {
                     sx={{ "&:hover": { backgroundColor: "#f9fafb" } }}
                   >
                     <TableCell sx={{ fontWeight: "500" }}>{holdingItem.symbol?.toUpperCase()}</TableCell>
-                    <TableCell align="right">{"$" + (holdingItem.currentPrice?.toFixed(2) || "N/A")}</TableCell>
+                    <TableCell align="right">{"$" + (holdingItem.currentPrice?.toFixed(4) || "N/A")}</TableCell>
                     <TableCell align="right">{holdingItem.amount}</TableCell>
-                    <TableCell align="right">{"$" + (holdingItem.totalValue?.toFixed(2) || "N/A")}</TableCell>
-                    <TableCell align="right">{"$" + (holdingItem.buyPrice?.toFixed(2) || "N/A")}</TableCell>
+                    <TableCell align="right">{"$" + (holdingItem.totalValue?.toFixed(4) || "N/A")}</TableCell>
+                    <TableCell align="right">{"$" + (holdingItem.buyPrice?.toFixed(4) || "N/A")}</TableCell>
                     <TableCell
                       align="right"
                       sx={{
@@ -60,11 +60,11 @@ function HoldingsTable({ holdingsList, onEditHolding, onDeleteHolding }) {
                         fontWeight: "bold",
                       }}
                     >
-                      {holdingItem.profitStatus === "profit" ? "+" : ""}${holdingItem.profit?.toFixed(2) || "N/A"}
+                      {holdingItem.profitStatus === "profit" ? "+" : ""}${holdingItem.profit?.toFixed(4) || "N/A"}
                     </TableCell>
                     <TableCell align="center">
                       <Chip
-                        label={`${holdingItem.profitStatus === "profit" ? "+" : ""}${holdingItem.profitPercent}%`}
+                        label={`${holdingItem.profitStatus === "profit" ? "+" : ""}${Number(holdingItem.profitPercent).toFixed(3)}%`}
                         color={holdingItem.profitStatus === "profit" ? "success" : "error"}
                         size="small"
                         icon={
@@ -78,13 +78,11 @@ function HoldingsTable({ holdingsList, onEditHolding, onDeleteHolding }) {
                     </TableCell>
                     <TableCell align="center" className="action-cell">
                       <IconButton size="small" onClick={() => {
-                        console.log('Edit holding:', holdingItem);
                         onEditHolding(holdingItem);
                       }}>
                         <EditIcon fontSize="small" />
                       </IconButton>
                       <IconButton size="small" color="error" onClick={() => {
-                        console.log('Delete holding:', holdingItem);
                         onDeleteHolding(holdingItem);
                       }}>
                         <DeleteIcon fontSize="small" />
