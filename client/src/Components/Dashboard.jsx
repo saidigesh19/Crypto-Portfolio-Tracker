@@ -14,7 +14,9 @@ import PortfolioCharts from "./dashboard/PortfolioCharts";
 import { Skeleton } from "@mui/material";
 import { getCookie } from '../utils/cookies';
 const Dashboard = () => {
-	const userId = getCookie("userId"); // Only use cookies for userId
+	// Get userId from cookies
+	const userId = getCookie("userId");
+	// Custom hook to fetch and manage holdings
 	const {
 		holdings,
 		setHoldings,
@@ -22,25 +24,30 @@ const Dashboard = () => {
 		error,
 	} = useHoldings(userId);
 
+	// State for portfolio summary, edit dialog, and delete confirmation
 	const [portfolioData, setPortfolioData] = useState(null);
 	const [editOpen, setEditOpen] = useState(false);
 	const [editHolding, setEditHolding] = useState(null);
 	const [confirmOpen, setConfirmOpen] = useState(false);
 	const [deleteTarget, setDeleteTarget] = useState(null);
 
-	// Edit dialog handlers
+	// --- Edit dialog handlers ---
+	// Open edit dialog for a holding
 	const openEdit = (holding) => {
 		setEditHolding(holding);
 		setEditOpen(true);
 	};
+	// Close edit dialog
 	const closeEdit = () => {
 		setEditOpen(false);
 		setEditHolding(null);
 	};
+	// Handle changes in edit dialog fields
 	const handleEditChange = (e) => {
 		const { name, value } = e.target;
 		setEditHolding((prev) => ({ ...prev, [name]: value }));
 	};
+	// Submit edited holding and refresh portfolio
 	const submitEdit = async () => {
 		if (!editHolding || !editHolding._id) return;
 		try {
@@ -64,10 +71,13 @@ const Dashboard = () => {
 			setHoldings(Array.isArray(data.holdings) ? data.holdings : []);
 			closeEdit();
 		} catch (err) {
-			// error handling
+			alert("Failed to update holding: " + (err.message || err));
 		}
 	};
-	const handleDelete = async(holding) => {
+
+	// --- Delete dialog handlers ---
+	// Open confirmation dialog for deleting a holding
+	const handleDelete = async (holding) => {
 		if (!holding || !holding._id) {
 			alert("Invalid holding selected for deletion.");
 			return;
@@ -76,6 +86,7 @@ const Dashboard = () => {
 		setConfirmOpen(true);
 	};
 
+	// Confirm and delete the selected holding
 	const confirmDelete = async () => {
 		if (!deleteTarget || !deleteTarget._id) {
 			setConfirmOpen(false);
@@ -94,6 +105,7 @@ const Dashboard = () => {
 		}
 	};
 
+	// --- Initial portfolio fetch on mount ---
 	useEffect(() => {
 		const seed = async () => {
 			if (!userId) {
@@ -110,12 +122,13 @@ const Dashboard = () => {
 				});
 				setHoldings(Array.isArray(data.holdings) ? data.holdings : []);
 			} catch (err) {
-				// error handling
+				alert("Failed to fetch portfolio: " + (err.message || err));
 			}
 		};
 		seed();
 	}, [userId, setHoldings]);
 
+	// --- Real-time portfolio updates via socket ---
 	useSocketPortfolio({
 		userId,
 		onUpdate: ({ payload }) => {
@@ -133,6 +146,7 @@ const Dashboard = () => {
 		},
 	});
 
+	// --- Loading and error states ---
 	if (loading) {
 		return (
 			<Container maxWidth="lg" sx={{ py: 4 }} className="dashboard-container">
@@ -151,14 +165,19 @@ const Dashboard = () => {
 		);
 	}
 
+	// --- Main dashboard UI ---
 	return (
 		<>
 			<Header />
 			<Container maxWidth="lg" sx={{ py: 4 }}>
+				{/* Portfolio summary cards */}
 				<PortfolioSummaryCards portfolioData={portfolioData} aria-label="Portfolio summary cards" />
+				{/* Portfolio distribution chart */}
 				<PortfolioCharts holdings={holdings} aria-label="Portfolio distribution chart" />
+				{/* Holdings table */}
 				<HoldingsTable holdingsList={holdings} onEditHolding={openEdit} onDeleteHolding={handleDelete} aria-label="Holdings table" />
 			</Container>
+			{/* Edit holding dialog */}
 			<EditHoldingDialog
 				open={editOpen}
 				holding={editHolding}
@@ -166,6 +185,7 @@ const Dashboard = () => {
 				onClose={closeEdit}
 				onSave={submitEdit}
 			/>
+			{/* Confirm delete dialog */}
 			<ConfirmDialog
 				open={confirmOpen}
 				title="Delete Holding"

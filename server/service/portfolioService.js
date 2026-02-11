@@ -8,6 +8,7 @@ export const buildUserPortfolios = (holdings, prices) => {
     const profit = currentValue - cost;
     const profitStatus = profit >= 0 ? "profit" : "loss";
 
+    // Initialize user portfolio if not present
     if (!users[h.userId]) {
       users[h.userId] = {
         totalCost: 0,
@@ -23,7 +24,6 @@ export const buildUserPortfolios = (holdings, prices) => {
     users[h.userId].totalProfit += profit;
 
     // Calculate profitPercent for each holding
-    
     const profitPercent = cost ? (profit / cost) * 100 : 0;
     users[h.userId].holdings.push({
       _id: h._id,

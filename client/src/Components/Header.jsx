@@ -11,38 +11,54 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import TimelineIcon from '@mui/icons-material/Timeline';
+import { getCookie, deleteCookie } from '../utils/cookies';
 
-const Header = ({ actionSlot }) => {
-  // Get user from localStorage
+// Accepts hideAddHolding prop to optionally hide the Add Holding button
+const Header = ({ actionSlot, hideAddHolding }) => {
+  // Get user name from localStorage or cookies
   let userName = "";
   try {
-    const user = JSON.parse(localStorage.getItem("user"));
-    userName = user?.name || "";
-    // Capitalize first letter of each word
-    userName = userName
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+    let user = localStorage.getItem("user");
+    if (!user) {
+      const cookieUser = getCookie("user");
+      if (cookieUser) user = cookieUser;
+    }
+    if (user) {
+      if (typeof user === "string") user = JSON.parse(user);
+      userName = user?.name || "";
+      // Capitalize first letter of each word
+      userName = userName
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
   } catch {}
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
+  // Open user menu
   const handleOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
+  // Close user menu
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+  // Handle user logout: clear storage/cookies and redirect
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("userId");
+    deleteCookie("token");
+    deleteCookie("user");
+    deleteCookie("userId");
     handleClose();
     navigate("/");
   };
 
+  // Render app bar with user info and menu
   return (
     <AppBar
       position="sticky"
@@ -75,17 +91,20 @@ const Header = ({ actionSlot }) => {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Box sx={{ mr: 1 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => navigate("/add-holding")}
-              sx={{ textTransform: "none", fontWeight: 600 }}
-            >
-              Add Holding
-            </Button>
-          </Box>
+          {/* Show Add Holding button unless hidden by prop */}
+          {!hideAddHolding && (
+            <Box sx={{ mr: 1 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={() => navigate("/add-holding")}
+                sx={{ textTransform: "none", fontWeight: 600 }}
+              >
+                Add Holding
+              </Button>
+            </Box>
+          )}
           <IconButton
             onClick={handleOpen}
             aria-controls="profile-menu"

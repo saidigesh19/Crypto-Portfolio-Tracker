@@ -3,7 +3,7 @@ import { computeUserPortfolio } from "../service/portfolioCompute.js";
 
 const router = express.Router();
 
-// GET /api/portfolio/:userId -> server-computed portfolio for the user
+// GET /api/portfolio/:userId - Get computed portfolio summary for a user
 router.get("/:userId", async (req, res) => {
   try {
     const data = await computeUserPortfolio(req.params.userId);

@@ -1,12 +1,13 @@
 import axios from "axios";
 
-// Simple in-memory cache to avoid hitting the CoinGecko rate limits too often.
+// Cache and rate limit settings
 const CACHE_TTL_MS = 90_000; // 90s cache window
 const RATE_LIMIT_BACKOFF_MS = 180_000; // 3m backoff after a 429
 const priceCache = new Map();
 let last429At = 0;
 let backoffWarned = false;
 
+// Fetches current USD prices for an array of coin IDs from CoinGecko
 const getPrice = async (coinIds) => {
   if (!Array.isArray(coinIds) || !coinIds.length) return null;
 
@@ -14,6 +15,7 @@ const getPrice = async (coinIds) => {
   const key = coinIds.map(String).sort().join(",");
   const now = Date.now();
 
+  // Serve from cache if available and not expired
   const cached = priceCache.get(key);
   if (cached && now - cached.timestamp < CACHE_TTL_MS) {
     return cached.data;
@@ -31,6 +33,7 @@ const getPrice = async (coinIds) => {
   }
 
   try {
+    // Call CoinGecko API for price data
     const ids = key;
     const url = "https://api.coingecko.com/api/v3/simple/price";
     const res = await axios.get(url, {
@@ -40,9 +43,11 @@ const getPrice = async (coinIds) => {
       },
     });
 
+    // Store result in cache
     priceCache.set(key, { data: res.data, timestamp: now });
     return res.data;
   } catch (err) {
+    // Handle rate limit and other errors
     const status = err?.response?.status;
     const msg = err?.response?.data?.status?.error_message || err.message;
     if (status === 429) {

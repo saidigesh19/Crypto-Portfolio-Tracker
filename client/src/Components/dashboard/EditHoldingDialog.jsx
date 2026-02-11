@@ -1,4 +1,3 @@
-import React from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from "@mui/material";
 
 const EditHoldingDialog = ({ open, holding, onChange, onClose, onSave }) => {
@@ -11,7 +10,6 @@ const EditHoldingDialog = ({ open, holding, onChange, onClose, onSave }) => {
           name="coinId" 
           value={holding?.coinId || ""} 
           size="small" 
-          InputProps={{ readOnly: true }} 
           margin="dense"
           helperText={holding?.coinId ? "Coin ID (read-only)" : "No Coin ID available"}
         />

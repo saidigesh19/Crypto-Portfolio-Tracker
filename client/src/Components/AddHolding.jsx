@@ -13,6 +13,7 @@ import { addHolding } from "../api/holdings";
 import { getCookie } from '../utils/cookies';
 
 const AddHolding = ({ onHoldingAdded }) => {
+  // State for form fields
   const [formData, setFormData] = useState({
     coinId: "",
     symbol: "",
@@ -20,10 +21,12 @@ const AddHolding = ({ onHoldingAdded }) => {
     buyPrice: "",
   });
 
+  // State for loading, error, and success messages
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
+  // Handle input changes for all form fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -33,10 +36,11 @@ const AddHolding = ({ onHoldingAdded }) => {
     setError(null);
   };
 
+  // Handle form submission to add a new holding
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
+    // Validation for required fields and positive numbers
     if (!formData.coinId || !formData.symbol || !formData.amount || !formData.buyPrice) {
       setError("All fields are required");
       return;
@@ -54,11 +58,13 @@ const AddHolding = ({ onHoldingAdded }) => {
 
     try {
       setLoading(true);
+      // Get userId from localStorage or cookies
       let userId = localStorage.getItem("userId");
       if (!userId) {
         userId = getCookie("userId");
       }
 
+      // Prepare payload for API
       const payload = {
         userId,
         coinId: formData.coinId.toLowerCase(),
@@ -67,6 +73,7 @@ const AddHolding = ({ onHoldingAdded }) => {
         buyPrice: parseFloat(formData.buyPrice),
       };
 
+      // Call API to add holding
       const newHolding = await addHolding(payload);
 
       setSuccess(true);
@@ -79,7 +86,7 @@ const AddHolding = ({ onHoldingAdded }) => {
 
       setTimeout(() => setSuccess(false), 3000);
 
-      // Notify parent component
+      // Notify parent component of new holding
       if (onHoldingAdded) {
         onHoldingAdded(newHolding);
       }
@@ -90,6 +97,7 @@ const AddHolding = ({ onHoldingAdded }) => {
     }
   };
 
+  // Render add holding form UI
   return (
     <Card sx={{ mb: 3, maxWidth: 600 }}>
       <CardContent>
@@ -97,19 +105,23 @@ const AddHolding = ({ onHoldingAdded }) => {
           Add New Holding
         </Typography>
 
+        {/* Show error message if any */}
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
 
+        {/* Show success message if holding added */}
         {success && (
           <Alert severity="success" sx={{ mb: 2 }}>
             Holding added successfully!
           </Alert>
         )}
 
+        {/* Holding form */}
         <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {/* Coin ID input */}
           <TextField
             label="Coin ID (e.g., bitcoin, ethereum)"
             name="coinId"
@@ -120,6 +132,7 @@ const AddHolding = ({ onHoldingAdded }) => {
             placeholder="bitcoin"
           />
 
+          {/* Symbol input */}
           <TextField
             label="Symbol (e.g., BTC, ETH)"
             name="symbol"
@@ -130,6 +143,7 @@ const AddHolding = ({ onHoldingAdded }) => {
             placeholder="BTC"
           />
 
+          {/* Amount input */}
           <TextField
             label="Amount"
             name="amount"
@@ -142,6 +156,7 @@ const AddHolding = ({ onHoldingAdded }) => {
             placeholder="0.5"
           />
 
+          {/* Buy Price input */}
           <TextField
             label="Buy Price (USD)"
             name="buyPrice"
@@ -154,6 +169,7 @@ const AddHolding = ({ onHoldingAdded }) => {
             placeholder="45000"
           />
 
+          {/* Submit button */}
           <Button
             type="submit"
             variant="contained"

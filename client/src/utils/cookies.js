@@ -1,4 +1,4 @@
-export function setCookie(name, value, days = 7) {
+export function setCookie(name, value, days = 1) {
   let expires = "";
   if (days) {
     const date = new Date();
