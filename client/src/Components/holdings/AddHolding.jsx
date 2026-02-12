@@ -9,8 +9,8 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import { addHolding } from "../api/holdings";
-import { getCookie } from '../utils/cookies';
+import { addHolding } from "../../api/holdings";
+import { getCookie } from '../../utils/cookies';
 
 const AddHolding = ({ onHoldingAdded }) => {
   // State for form fields

@@ -3,9 +3,9 @@ import React, { useState, useEffect, createContext } from 'react'
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Dashboard from "./Components/DashBoard";
-import Login from "./Components/Login";
-import Register from "./Components/Register";
+import Dashboard from "./pages/Dashboard";
+import Login from "./Components/auth/Login";
+import Register from "./Components/auth/Register";
 import AddHoldingPage from "./Components/AddHoldingPage";
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });

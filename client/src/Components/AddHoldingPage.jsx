@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Card, CardContent, Typography, Button } from '@mui/material';
-import AddHolding from './AddHolding';
+import AddHolding from './holdings/AddHolding';
 import Header from './Header';
 
 const AddHoldingPage = () => {

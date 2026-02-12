@@ -11,7 +11,7 @@ let backoffWarned = false;
 const getPrice = async (coinIds) => {
   if (!Array.isArray(coinIds) || !coinIds.length) return null;
 
-  // Normalize/sort to keep cache keys stable regardless of order
+  // sort to keep cache keys stable regardless of order
   const key = coinIds.map(String).sort().join(",");
   const now = Date.now();
 

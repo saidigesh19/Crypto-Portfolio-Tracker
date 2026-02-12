@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Container, Typography, Button } from "@mui/material";
-import ConfirmDialog from "./dashboard/ConfirmDialog";
-import Header from "./Header";
-import PortfolioSummaryCards from "./dashboard/PortfolioSummaryCards";
-import HoldingsTable from "./dashboard/HoldingsTable";
-import EditHoldingDialog from "./dashboard/EditHoldingDialog";
+import ConfirmDialog from "../Components/dashboard/ConfirmDialog";
+import Header from "../Components/Header";
+import PortfolioSummaryCards from "../Components/dashboard/PortfolioSummaryCards";
+import HoldingsTable from "../Components/dashboard/HoldingsTable";
+import EditHoldingDialog from "../Components/dashboard/EditHoldingDialog";
 import useHoldings from "../hooks/useHoldings";
 import useSocketPortfolio from "../hooks/useSocketPortfolio";
 import { updateHolding, deleteHolding } from "../api/holdings";
 import { getPortfolio } from "../api/portfolio";
 import "../styles/Dashboard.css";
-import PortfolioCharts from "./dashboard/PortfolioCharts";
+import PortfolioCharts from "../Components/dashboard/PortfolioCharts";
 import { Skeleton } from "@mui/material";
 import { getCookie } from '../utils/cookies';
 const Dashboard = () => {

@@ -1,5 +1,5 @@
 import Holding from "../model/Holding.js";
-import getPrice from "../controller/coingecko.js";
+import getPrice from "../Controller/coingecko.js";
 import { buildUserPortfolios } from "./portfolioService.js";
 
 // Returns an empty portfolio object
@@ -13,7 +13,7 @@ const emptyPortfolio = () => ({
 });
 
 // Computes the portfolio summary for a given user
-export const computeUserPortfolio = async (userId) => {
+const computeUserPortfolio = async (userId) => {
   if (!userId) return emptyPortfolio();
   const holdings = await Holding.find({ userId });
   if (!holdings.length) return emptyPortfolio();
@@ -41,7 +41,8 @@ export const computeUserPortfolio = async (userId) => {
 };
 
 // Computes and emits the user's portfolio to their socket room
-export const computeAndEmitUser = async (io, userId) => {
+const computeAndEmitUser = async (io, userId) => {
+    // export block moved to bottom for ES6
   try {
     const data = await computeUserPortfolio(userId);
     if (io && typeof io.to === "function") {
@@ -59,4 +60,5 @@ export const computeAndEmitUser = async (io, userId) => {
     console.error("computeAndEmitUser error", err?.message || err);
     return emptyPortfolio();
   }
-};
+  };
+  export { computeUserPortfolio, computeAndEmitUser };

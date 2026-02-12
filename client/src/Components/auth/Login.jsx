@@ -1,4 +1,3 @@
-// Login component handles user authentication and login UI
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,9 +10,9 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { login } from "../api/auth";
+import { login } from "../../api/auth";
 import LockIcon from '@mui/icons-material/Lock';
-import { setCookie } from '../utils/cookies';
+import { setCookie } from '../../utils/cookies';
 
 export default function Login() {
   // State for email, password, error message, and loading status

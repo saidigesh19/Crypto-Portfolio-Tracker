@@ -1,4 +1,4 @@
-export const buildUserPortfolios = (holdings, prices) => {
+const buildUserPortfolios = (holdings, prices) => {
   const users = {};
 
   holdings.forEach((h) => {
@@ -41,3 +41,5 @@ export const buildUserPortfolios = (holdings, prices) => {
 
   return users;
 };
+
+export { buildUserPortfolios };

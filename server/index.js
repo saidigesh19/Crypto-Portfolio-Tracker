@@ -1,16 +1,17 @@
-
 // Main server entry point for Crypto Portfolio Tracker backend
+
+
 import express from 'express';
-import http from "http";
+import http from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import connectDB from "./config/db.js";
-import { holdingsRouter, injectIO } from "./router/holdingsRouter.js";
-import authRouter from "./router/auth.js";
-import setupSocket from "./socket.js";
-import startPriceJob from "./priceJob.js";
-import portfolio from "./router/portfolioRouter.js";
+import connectDB from './config/db.js';
+import holdingsRouter from './router/holdingsRouter.js';
+import authRouter from './router/auth.js';
+import setupSocket from './socket.js';
+import startPriceJob from './priceJob.js';
+import portfolio from './router/portfolioRouter.js';
 
 // Load environment variables
 dotenv.config();
@@ -31,7 +32,7 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 // API routes
 // Inject io into holding routes for real-time updates
-app.use("/api/holdings", injectIO(io), holdingsRouter);
+app.use("/api/holdings", holdingsRouter.injectIO ? holdingsRouter.injectIO(io) : (req, res, next) => next(), holdingsRouter);
 app.use("/api/portfolio", portfolio);
 app.use("/api", authRouter);
 

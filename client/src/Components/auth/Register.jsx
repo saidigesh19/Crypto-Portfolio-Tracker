@@ -1,7 +1,5 @@
-
-// React and MUI imports
 import { useState } from "react";
-import person from "../assets/react.svg";
+import person from "../../assets/react.svg";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -13,7 +11,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { signup } from "../api/auth";
+import { signup } from "../../api/auth";
 
 
 // Register component handles user registration logic and UI

@@ -1,18 +1,22 @@
+
+
 import express from "express";
 import {
   createHolding,
   getHoldingsByUser,
   updateHoldingById,
   deleteHoldingById,
-} from "../controller/holdingController.js";
+} from "../Controller/holdingController.js";
 
 // Middleware to inject io instance into req
+
 function injectIO(io) {
   return (req, res, next) => {
     req.io = io;
     next();
   };
 }
+
 
 const router = express.Router();
 
@@ -26,6 +30,5 @@ router.put("/:id", updateHoldingById);
 router.delete("/:id", deleteHoldingById);
 
 // These will be wrapped with injectIO in server/index.js
-export { router as holdingsRouter, injectIO };
-
 export default router;
+export { injectIO };

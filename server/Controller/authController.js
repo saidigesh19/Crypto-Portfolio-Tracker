@@ -1,3 +1,4 @@
+
 import User from "../model/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -5,7 +6,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
 
 // Handle user registration
-export const signup = async (req, res) => {
+const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
@@ -29,8 +30,9 @@ export const signup = async (req, res) => {
   }
 };
 
+
 // Handle user login
-export const login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -54,3 +56,5 @@ export const login = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+export { signup, login };

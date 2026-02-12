@@ -2,7 +2,7 @@ import Holding from "../model/Holding.js";
 import { computeAndEmitUser } from "../service/portfolioCompute.js";
 
 // Create a new holding
-export const createHolding = async (req, res) => {
+const createHolding = async (req, res) => {
   try {
     const holding = await Holding.create(req.body);
     res.status(201).json(holding);
@@ -12,7 +12,7 @@ export const createHolding = async (req, res) => {
 };
 
 // Get all holdings for a specific user
-export const getHoldingsByUser = async (req, res) => {
+const getHoldingsByUser = async (req, res) => {
   try {
     const holding = await Holding.find({ userId: req.params.userId });
     res.json(holding);
@@ -22,9 +22,8 @@ export const getHoldingsByUser = async (req, res) => {
 };
 
 // Update a holding by its ID
-
 // Expects req.io to be set by router
-export const updateHoldingById = async (req, res) => {
+const updateHoldingById = async (req, res) => {
   try {
     const updated = await Holding.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updated) return res.status(404).json({ message: "Not found" });
@@ -39,8 +38,7 @@ export const updateHoldingById = async (req, res) => {
 };
 
 // Delete a holding by its ID
-
-export const deleteHoldingById = async (req, res) => {
+const deleteHoldingById = async (req, res) => {
   try {
     // Find holding to get userId before deleting
     const holding = await Holding.findById(req.params.id);
@@ -55,3 +53,5 @@ export const deleteHoldingById = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export { createHolding, getHoldingsByUser, updateHoldingById, deleteHoldingById };
